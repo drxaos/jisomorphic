@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.drxaos</groupId>
+    <artifactId>jisomorphic</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>war</packaging>
+
+    <name>jIsomorphic</name>
+    <description>Isomorphic java web application</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-classlib</artifactId>
+            <version>0.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-jso</artifactId>
+            <version>0.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-dom</artifactId>
+            <version>0.3.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.teavm</groupId>
+            <artifactId>teavm-html4j</artifactId>
+            <version>0.3.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Jetty -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-webapp</artifactId>
+            <version>9.2.3.v20140905</version>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/java</directory>
+                <includes>
+                    <include>**/*.java</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.17</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>2.17</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${project.build.directory}/generated/js</directory>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.teavm</groupId>
+                <artifactId>teavm-maven-plugin</artifactId>
+                <version>0.3.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>web-client</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>build-javascript</goal>
+                        </goals>
+                        <configuration>
+                            <targetDirectory>${project.build.directory}/generated/js/teavm</targetDirectory>
+                            <mainClass>io.github.drxaos.jisomorphic.Dispatcher</mainClass>
+                            <runtime>SEPARATE</runtime>
+                            <minifying>false</minifying>
+                            <debugInformationGenerated>true</debugInformationGenerated>
+                            <sourceMapsGenerated>true</sourceMapsGenerated>
+                            <sourceFilesCopied>true</sourceFilesCopied>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.2.3.v20140905</version>
+                <configuration>
+                    <stopKey>STOP</stopKey>
+                    <stopPort>8005</stopPort>
+                    <webApp>
+                        <contextPath>/</contextPath>
+                        <resourceBases>
+                            <resourceBase>src/main/webapp</resourceBase>
+                            <resourceBase>target/generated</resourceBase>
+                        </resourceBases>
+                    </webApp>
+                    <httpConnector>
+                        <port>8812</port>
+                    </httpConnector>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>
