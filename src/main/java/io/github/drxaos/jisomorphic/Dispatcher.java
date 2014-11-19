@@ -2,67 +2,94 @@ package io.github.drxaos.jisomorphic;
 
 import io.github.drxaos.jisomorphic.context.Context;
 import io.github.drxaos.jisomorphic.pages.Page;
-import io.github.drxaos.jisomorphic.pages.Static;
-import io.github.drxaos.jisomorphic.pages.Test;
+import io.github.drxaos.jisomorphic.templater.Template;
 import io.github.drxaos.jisomorphic.templater.WebLoader;
 import net.java.html.js.JavaScriptBody;
-import org.teavm.dom.browser.TimerHandler;
 import org.teavm.dom.browser.Window;
 import org.teavm.dom.core.Element;
 import org.teavm.dom.core.NodeList;
 import org.teavm.dom.html.HTMLDocument;
 import org.teavm.jso.JS;
 
-import javax.servlet.http.HttpServlet;
+public class Dispatcher {
 
-public class Dispatcher extends HttpServlet {
+    private static long pid = System.currentTimeMillis();
 
     private static Window window = (Window) JS.getGlobal();
     private static HTMLDocument document = window.getDocument();
 
-    public static void main(String[] args) {
-        NodeList<Element> a = document.getElementsByTagName("a");
-        // TODO onClick -> load(href);
+    public static long getPid() {
+        return pid;
+    }
 
+    /**
+     * Page behavior after load
+     */
+    public static void main(String[] args) {
+        final String location = pathname();
         addRelocationTrigger();
 
-        window.setTimeout(new TimerHandler() {
-            @Override
-            public void onTimer() {
-                load("/test/new/page/opened");
-            }
-        }, 5000);
-    }
+        NodeList<Element> a = document.getElementsByTagName("a");
+        // TODO a.onClick -> load(href);
 
-    public static void load(String url) {
-        Page[] pages = {new Test(), new Static()};
 
-        String location = pathname();
-        for (Page page : pages) {
-            try {
-                if (page.accepts(location)) {
-                    Context ctx = new Context();
-                    ctx.loader = new WebLoader();
-                    page.init(ctx);
-                    String rendered = page.render(location);
-                    push(url, rendered);
-                    return;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        try {
+            Page page = Pages.findPage(location);
+            WebLoader webLoader = new WebLoader();
+            page.init(new Context(webLoader, ++pid));
+            page.animate(location);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-
-
     }
 
-    @JavaScriptBody(args = {"url", "content"}, body =
+    /**
+     * Load page when user clicks a link and push new url to history
+     *
+     * @param url link href
+     */
+    public static void load(final String url) {
+        try {
+            WebLoader webLoader = new WebLoader();
+            webLoader.setLoaderCallback(new WebLoader.LoaderCallback() {
+                @Override
+                public void ready(Template template) {
+                    if (pid != Dispatcher.getPid()) {
+                        return;
+                    }
+                    loaded(url, template.getTitle(), template.getPage());
+                }
+            });
+            Page page = Pages.findPage(url);
+            page.init(new Context(webLoader, pid));
+            page.render(url);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void loaded(String url, String title, String rendered) {
+        try {
+            push(url, title, rendered);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void onPopState(String url, String title, String html) {
+        load(url);
+    }
+
+    @JavaScriptBody(args = {"url", "title", "content"}, body =
             ""
-                    + "window.history.pushState({\"data\":\"smth\"}, \"Title1\", url);"
+                    + "window.history.pushState({\"url\":url, \"title\":title, \"html\":content}, title, url);"
                     + "document.open();document.write(content);document.close();"
     )
-    private static native void push(String location, String content);
+    private static native void push(String location, String title, String content);
 
+    /**
+     * @return Current page path
+     */
     @JavaScriptBody(args = {}, body =
             ""
                     + "var h;"
@@ -74,17 +101,15 @@ public class Dispatcher extends HttpServlet {
     )
     private static native String pathname();
 
-    // TODO
-    @JavaScriptBody(args = {"callback"}, body = "" +
-            "window.onpopstate = function(e){\n" +
-            "    if(e.state){\n" +
-            "        document.getElementById(\"content\").innerHTML = e.state.html;\n" +
-            "        document.title = e.state.pageTitle;\n" +
-            "    }\n" +
-            "};" +
-            "return callback." +
-            "@org.teavm.html4j.test.B::bar(" +
-            "Lorg/teavm/html4j/test/A;)(_global_)", javacall = true)
-    private static native String addRelocationTrigger();
+    /**
+     * Handle browser back button
+     */
+    @JavaScriptBody(args = {}, body = ""
+            + "window.onpopstate = function(e){\n"
+            + "    if(e.state){\n"
+            + "        @io.github.drxaos.jisomorphic.Dispatcher::onPopState(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)(e.state.url,e.state.title,e.state.html);\n"
+            + "    }\n"
+            + "};", javacall = true)
+    private static native void addRelocationTrigger();
 
 }

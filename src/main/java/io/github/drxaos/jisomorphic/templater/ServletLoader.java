@@ -14,12 +14,9 @@ public class ServletLoader implements Loader {
         this.servletContext = servletContext;
     }
 
-    public String load(String path) throws IOException {
+    @Override
+    public void load(String path, Template template, Callback callback) throws IOException {
         InputStream input = servletContext.getResourceAsStream(path);
-        if (input == null) {
-            return null;
-        }
-        return IOUtils.toString(input);
+        callback.recv(input == null ? "" : IOUtils.toString(input), template);
     }
-
 }

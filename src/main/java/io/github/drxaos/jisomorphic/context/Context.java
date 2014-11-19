@@ -4,5 +4,10 @@ import io.github.drxaos.jisomorphic.templater.Loader;
 
 public class Context {
     public Loader loader;
+    public long pid;
 
+    public Context(Loader loader, long pid) {
+        this.loader = loader;
+        this.pid = pid;
+    }
 }

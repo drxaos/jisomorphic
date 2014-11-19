@@ -1,22 +1,31 @@
 package io.github.drxaos.jisomorphic.pages;
 
+import io.github.drxaos.jisomorphic.Dispatcher;
+import io.github.drxaos.jisomorphic.templater.Loader;
+import io.github.drxaos.jisomorphic.templater.Template;
+
 import java.io.IOException;
 
 public class Static extends Page {
 
     @Override
     public boolean accepts(String url) {
-        return url.startsWith("/teavm/") || url.equals("/favicon.ico");
+        return true;
     }
 
     @Override
-    public String render(String url) throws IOException {
-        if (url.startsWith("/teavm/")) {
-            return context.loader.load("/js" + url);
-        }
-        if (url.equals("/favicon.ico")) {
-            return context.loader.load("/images/favicon.ico");
-        }
-        return null;
+    public Template render(final String url) throws IOException {
+        Template template = new Template();
+        context.loader.load(url, template, new Loader.Callback() {
+            @Override
+            public void recv(String data, Template template) {
+                template.setPage(data, url);
+            }
+        });
+        return template;
+    }
+
+    @Override
+    public void animate(String url) throws IOException {
     }
 }
