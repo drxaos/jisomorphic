@@ -1,7 +1,10 @@
 package io.github.drxaos.jisomorphic;
 
-import io.github.drxaos.jisomorphic.context.Context;
+import io.github.drxaos.jisomorphic.api.Api;
+import io.github.drxaos.jisomorphic.api.ApiContext;
+import io.github.drxaos.jisomorphic.db.DatabaseImpl;
 import io.github.drxaos.jisomorphic.pages.Page;
+import io.github.drxaos.jisomorphic.pages.PageContext;
 import io.github.drxaos.jisomorphic.templater.ServletLoader;
 import io.github.drxaos.jisomorphic.templater.Template;
 
@@ -17,10 +20,19 @@ public class DispatcherServlet extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String location = request.getRequestURI();
         Page page = Pages.findPage(location);
-        page.init(new Context(new ServletLoader(getServletContext()), 0));
+        page.init(new PageContext(new ServletLoader(getServletContext()), 0));
         Template rendered = page.render(location);
         rendered.postProcess();
         response.getWriter().write(rendered.getPage());
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String location = request.getRequestURI();
+        Api api = Apis.findApi(location);
+        api.init(new ApiContext(new ServletLoader(getServletContext()), new DatabaseImpl()));
+        String rendered = api.render(location);
+        response.getWriter().write(rendered);
     }
 
 }

@@ -1,14 +1,14 @@
 package io.github.drxaos.jisomorphic;
 
 import io.github.drxaos.jisomorphic.pages.Page;
-import io.github.drxaos.jisomorphic.pages.Static;
-import io.github.drxaos.jisomorphic.pages.Test;
+import io.github.drxaos.jisomorphic.pages.StaticResource;
+import io.github.drxaos.jisomorphic.pages.TestPage;
 
 public class Pages {
 
     static Page[] pages = {
-            new Test(),
-            new Static()
+            new TestPage(),
+            new StaticResource()
     };
 
     /**

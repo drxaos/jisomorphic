@@ -10,7 +10,7 @@ import org.teavm.jso.JS;
 
 import java.io.IOException;
 
-public class Test extends Page {
+public class TestPage extends Page {
 
     @Override
     public boolean accepts(String url) {
@@ -20,16 +20,22 @@ public class Test extends Page {
     @Override
     public Template render(String url) throws IOException {
         Template template = new Template();
-        context.loader.load("/templates/index.html", template, new Loader.Callback() {
+        context.loader.load("/templates/index.html", template, new Loader.ResourceCallback() {
             @Override
             public void recv(String data, Template template) {
                 template.put("index.html", data);
             }
         });
-        context.loader.load("/templates/test.html", template, new Loader.Callback() {
+        context.loader.load("/templates/test.html", template, new Loader.ResourceCallback() {
             @Override
             public void recv(String data, Template template) {
                 template.put("test.html", data);
+            }
+        });
+        context.loader.api("/time/now", template, new Loader.ResourceCallback() {
+            @Override
+            public void recv(String data, Template template) {
+                template.put("time", data);
             }
         });
         template.setPostProcessor(new Template.PostProcessor() {
@@ -39,7 +45,7 @@ public class Test extends Page {
                 template.setPage(template.get("index.html")
                                 .replace("%TITLE%", title)
                                 .replace("%BODY%", template.get("test.html")
-                                                .replace("%TIME%", "" + System.currentTimeMillis())
+                                                .replace("%TIME%", template.get("time"))
                                 ),
                         title
                 );
@@ -58,7 +64,17 @@ public class Test extends Page {
                 if (context.pid != Dispatcher.getPid()) {
                     return;
                 }
-                Dispatcher.load("/test/new/page/opened/" + System.currentTimeMillis());
+                Template template = new Template();
+                try {
+                    context.loader.api("/time/now", template, new Loader.ResourceCallback() {
+                        @Override
+                        public void recv(String data, Template template) {
+                            Dispatcher.load("/test/new/page/opened/" + data);
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }, 5000);
     }

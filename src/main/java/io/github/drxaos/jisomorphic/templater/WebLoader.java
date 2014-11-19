@@ -1,6 +1,5 @@
 package io.github.drxaos.jisomorphic.templater;
 
-import io.github.drxaos.jisomorphic.Dispatcher;
 import org.teavm.dom.ajax.ReadyStateChangeHandler;
 import org.teavm.dom.ajax.XMLHttpRequest;
 import org.teavm.dom.browser.Window;
@@ -26,27 +25,39 @@ public class WebLoader implements Loader {
 
     private static Window window = (Window) JS.getGlobal();
 
-    @Override
-    public void load(String path, final Template template, final Callback callback) throws IOException {
-        final long pid = Dispatcher.getPid();
+    private void request(String path, final Template template, final ResourceCallback callback, boolean post) throws IOException {
         final XMLHttpRequest xhr = window.createXMLHttpRequest();
         xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
             @Override
             public void stateChanged() {
                 if (xhr.getReadyState() == XMLHttpRequest.DONE) {
                     String data = xhr.getResponseText();
-                    // TODO cache data
+                    // TODO cache data if not post
                     callback.recv(data, template);
                     template.removeCallback(callback);
                     if (template.isReady()) {
                         template.postProcess();
-                        loaderCallback.ready(template);
+                        if (loaderCallback != null) {
+                            loaderCallback.ready(template);
+                            loaderCallback = null;
+                        }
                     }
                 }
             }
         });
-        xhr.open("GET", path);
+        xhr.open(post ? "POST" : "GET", path);
         xhr.send();
         template.addCallback(callback);
+    }
+
+    @Override
+    public void load(String path, final Template template, final ResourceCallback callback) throws IOException {
+        request(path, template, callback, false);
+
+    }
+
+    @Override
+    public void api(String path, final Template template, final ResourceCallback callback) throws IOException {
+        request(path, template, callback, true);
     }
 }
