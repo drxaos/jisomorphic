@@ -2,11 +2,11 @@ package io.github.drxaos.jisomorphic;
 
 import io.github.drxaos.jisomorphic.api.Api;
 import io.github.drxaos.jisomorphic.api.ApiContext;
-import io.github.drxaos.jisomorphic.db.DatabaseImpl;
+import io.github.drxaos.jisomorphic.db.Database;
+import io.github.drxaos.jisomorphic.loading.ServletLoader;
+import io.github.drxaos.jisomorphic.loading.Template;
 import io.github.drxaos.jisomorphic.pages.Page;
 import io.github.drxaos.jisomorphic.pages.PageContext;
-import io.github.drxaos.jisomorphic.templater.ServletLoader;
-import io.github.drxaos.jisomorphic.templater.Template;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,20 +18,20 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String location = request.getRequestURI();
-        Page page = Pages.findPage(location);
+        String url = request.getRequestURI();
+        Page page = Page.findPage(url);
         page.init(new PageContext(new ServletLoader(getServletContext()), 0));
-        Template rendered = page.render(location);
+        Template rendered = page.render((url.length() > page.getUrl().length()) ? url.substring(page.getUrl().length() + 1) : "");
         rendered.postProcess();
         response.getWriter().write(rendered.getPage());
     }
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String location = request.getRequestURI();
-        Api api = Apis.findApi(location);
-        api.init(new ApiContext(new ServletLoader(getServletContext()), new DatabaseImpl()));
-        String rendered = api.render(location);
+        String url = request.getRequestURI();
+        Api api = Api.findApi(url);
+        api.init(new ApiContext(new ServletLoader(getServletContext()), new Database()));
+        String rendered = api.render((url.length() > api.getUrl().length()) ? url.substring(api.getUrl().length() + 1) : "");
         response.getWriter().write(rendered);
     }
 

@@ -1,4 +1,7 @@
 package io.github.drxaos.jisomorphic.db;
 
-public interface Database {
+import java.sql.Connection;
+
+public class Database {
+    Connection connection;
 }

@@ -1,4 +1,4 @@
-package io.github.drxaos.jisomorphic.templater;
+package io.github.drxaos.jisomorphic.loading;
 
 import org.teavm.dom.ajax.ReadyStateChangeHandler;
 import org.teavm.dom.ajax.XMLHttpRequest;

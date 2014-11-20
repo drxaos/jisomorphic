@@ -1,9 +1,9 @@
 package io.github.drxaos.jisomorphic;
 
+import io.github.drxaos.jisomorphic.loading.Template;
+import io.github.drxaos.jisomorphic.loading.WebLoader;
 import io.github.drxaos.jisomorphic.pages.Page;
 import io.github.drxaos.jisomorphic.pages.PageContext;
-import io.github.drxaos.jisomorphic.templater.Template;
-import io.github.drxaos.jisomorphic.templater.WebLoader;
 import net.java.html.js.JavaScriptBody;
 import org.teavm.dom.browser.Window;
 import org.teavm.dom.core.Element;
@@ -34,7 +34,7 @@ public class Dispatcher {
 
 
         try {
-            Page page = Pages.findPage(location);
+            Page page = Page.findPage(location);
             WebLoader webLoader = new WebLoader();
             page.init(new PageContext(webLoader, ++pid));
             page.animate(location);
@@ -57,15 +57,12 @@ public class Dispatcher {
                     if (pid != Dispatcher.getPid()) {
                         return;
                     }
-                    System.out.println("A");
-                    System.out.println(url);
-                    System.out.println("B");
                     loaded(url, template.getTitle(), template.getPage());
                 }
             });
-            Page page = Pages.findPage(url);
+            Page page = Page.findPage(url);
             page.init(new PageContext(webLoader, pid));
-            page.render(url);
+            page.render((url.length() > page.getUrl().length()) ? url.substring(page.getUrl().length() + 1) : "");
         } catch (Exception e) {
             e.printStackTrace();
         }

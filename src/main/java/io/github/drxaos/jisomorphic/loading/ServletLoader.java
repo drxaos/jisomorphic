@@ -1,9 +1,8 @@
-package io.github.drxaos.jisomorphic.templater;
+package io.github.drxaos.jisomorphic.loading;
 
-import io.github.drxaos.jisomorphic.Apis;
 import io.github.drxaos.jisomorphic.api.Api;
 import io.github.drxaos.jisomorphic.api.ApiContext;
-import io.github.drxaos.jisomorphic.db.DatabaseImpl;
+import io.github.drxaos.jisomorphic.db.Database;
 import org.apache.commons.io.IOUtils;
 
 import javax.servlet.ServletContext;
@@ -26,9 +25,9 @@ public class ServletLoader implements Loader {
 
     @Override
     public void api(String path, final Template template, final ResourceCallback callback) throws IOException {
-        Api api = Apis.findApi(path);
-        api.init(new ApiContext(new ServletLoader(servletContext), new DatabaseImpl()));
-        String result = api.render(path);
+        Api api = Api.findApi(path);
+        api.init(new ApiContext(new ServletLoader(servletContext), new Database()));
+        String result = api.render((path.length() > api.getUrl().length()) ? path.substring(api.getUrl().length() + 1) : "");
         callback.recv(result == null ? "" : result, template);
     }
 }

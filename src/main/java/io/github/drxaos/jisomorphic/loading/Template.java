@@ -1,4 +1,4 @@
-package io.github.drxaos.jisomorphic.templater;
+package io.github.drxaos.jisomorphic.loading;
 
 import java.util.ArrayList;
 import java.util.HashMap;
