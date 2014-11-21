@@ -7,7 +7,7 @@ import java.io.IOException;
 public class UidApi extends Api {
     private static long uid = 1000000;
 
-    private static String URL = "/api/time";
+    private static String URL = "/api/uid";
 
     public UidApi() {
         url = URL;
@@ -23,9 +23,9 @@ public class UidApi extends Api {
 
     @Override
     public String render(String params) throws IOException {
-        if (url.equals("next")) {
+        if (params.equals("next")) {
             return "" + ++uid;
-        } else if (url.equals("current")) {
+        } else if (params.equals("current")) {
             return "" + uid;
         }
         return "unknown";

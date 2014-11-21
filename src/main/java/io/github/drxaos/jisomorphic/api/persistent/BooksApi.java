@@ -1,11 +1,12 @@
 package io.github.drxaos.jisomorphic.api.persistent;
 
 import io.github.drxaos.jisomorphic.api.Api;
+import io.github.drxaos.jisomorphic.db.Book;
 import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
 public class BooksApi extends Api {
 
@@ -22,18 +23,16 @@ public class BooksApi extends Api {
     @Override
     public String render(String params) throws IOException {
         if (params.equals("list")) {
-            return JSONValue.toJSONString(list());
+            return list();
         }
         return "error";
     }
 
-    private List<String> list() {
-        ArrayList<String> books = new ArrayList<String>();
-
-        books.add("Book1");
-        books.add("Book2");
-        books.add("Book3");
-
-        return books;
+    private String list() {
+        ArrayList<Map> result = new ArrayList<Map>();
+        for (Book book : Book.findBooks(context.database)) {
+            result.add(book.asMap());
+        }
+        return JSONValue.toJSONString(result);
     }
 }

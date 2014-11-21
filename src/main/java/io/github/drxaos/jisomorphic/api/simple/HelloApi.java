@@ -1,6 +1,8 @@
 package io.github.drxaos.jisomorphic.api.simple;
 
 import io.github.drxaos.jisomorphic.api.Api;
+import io.github.drxaos.jisomorphic.loading.Loader;
+import io.github.drxaos.jisomorphic.loading.Template;
 
 import java.io.IOException;
 
@@ -18,6 +20,21 @@ public class HelloApi extends Api {
 
     @Override
     public String render(String params) throws IOException {
+        return hello() + "! " + id();
+    }
+
+    public String id() throws IOException {
+        Template template = new Template();
+        context.loader.api(UidApi.makeUrlNext(), template, new Loader.ResourceCallback() {
+            @Override
+            public void recv(String data, Template template) {
+                template.put("data", data);
+            }
+        });
+        return template.getString("data");
+    }
+
+    public String hello() throws IOException {
         int n = (int) (System.currentTimeMillis() % 10);
         switch (n) {
             case 0:
@@ -25,21 +42,21 @@ public class HelloApi extends Api {
             case 1:
                 return "Hallo";
             case 2:
-                return "привет";
+                return "Ahalan";
             case 3:
                 return "Sveiki";
             case 4:
-                return "bonjour";
+                return "Bonjour";
             case 5:
                 return "Hola";
             case 6:
                 return "Ola";
             case 7:
-                return "merhaba";
+                return "Merhaba";
             case 8:
-                return "здравей";
+                return "Parev";
             case 9:
-                return "γειά σου";
+                return "Aloha";
             default:
                 return "Hello";
         }

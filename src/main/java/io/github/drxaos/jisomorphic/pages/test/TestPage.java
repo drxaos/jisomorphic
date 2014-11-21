@@ -55,10 +55,13 @@ public class TestPage extends Page {
             @Override
             public void process(Template template) {
                 String title = (System.currentTimeMillis() % 2 == 0) ? "Some title" : "Hello World!";
-                template.setPage(template.get("index.html")
-                                .replace("%TITLE%", title)
-                                .replace("%BODY%", template.get("test.html")
-                                                .replace("%TIME%", template.get("time"))
+                template.setPage(template.getString("index.html").replace(
+                                "%TITLE%", title
+                        ).replace(
+                                "%BODY%", template.getString("test.html")
+                                                .replace(
+                                                        "%TIME%", template.getString("time")
+                                                )
                                 ),
                         title
                 );
@@ -123,7 +126,7 @@ public class TestPage extends Page {
             @Override
             public void process(Template template) {
                 HTMLElement responseElem = document.createElement("div");
-                responseElem.appendChild(document.createTextNode(template.get("data")));
+                responseElem.appendChild(document.createTextNode(template.getString("data")));
                 responsePanel.appendChild(responseElem);
                 helloButton.setDisabled(false);
             }

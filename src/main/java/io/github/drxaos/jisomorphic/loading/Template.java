@@ -53,7 +53,7 @@ public class Template {
         this.title = title;
     }
 
-    HashMap<String, String> map = new HashMap<String, String>();
+    HashMap<String, Object> map = new HashMap<String, Object>();
 
     public int size() {
         return map.size();
@@ -63,19 +63,30 @@ public class Template {
         return map.isEmpty();
     }
 
-    public String get(String key) {
+    public Object get(String key) {
         return map.get(key);
+    }
+
+    public String getString(String key) {
+        Object val = map.get(key);
+        if (val == null) {
+            return null;
+        } else if (val instanceof String) {
+            return (String) val;
+        } else {
+            return val.toString();
+        }
     }
 
     public boolean containsKey(String key) {
         return map.containsKey(key);
     }
 
-    public Object put(String key, String value) {
+    public Object put(String key, Object value) {
         return map.put(key, value);
     }
 
-    public void putAll(Map<? extends String, ? extends String> m) {
+    public void putAll(Map<? extends String, ?> m) {
         map.putAll(m);
     }
 
@@ -87,7 +98,7 @@ public class Template {
         map.clear();
     }
 
-    public boolean containsValue(String value) {
+    public boolean containsValue(Object value) {
         return map.containsValue(value);
     }
 }
