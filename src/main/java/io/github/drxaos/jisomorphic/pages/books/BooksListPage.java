@@ -24,6 +24,7 @@ public class BooksListPage extends Page {
 
     @Override
     public Template render(String params) throws IOException {
+        final String title = "Books List";
         Template template = new Template();
         context.loader.load("/templates/index.html", template, new Loader.ResourceCallback() {
             @Override
@@ -52,9 +53,15 @@ public class BooksListPage extends Page {
                             .append(book.get("pageCount"))
                             .append(")<br/>");
                 }
+                b.append("<a href=\"" + BooksListPage.makeUrl(0) + "\">First</a>");
+                for (int i = 1; i < 5; i++) {
+                    b.append("/ <a href=\"" + BooksListPage.makeUrl(i) + "\">" + i + "</a>");
+                }
                 template.setPage(template.getString("index.html").replace(
                         "%BODY%", b.toString()
-                ), "Books List");
+                ).replace(
+                        "%TITLE%", title
+                ), title);
             }
         });
         return template;
