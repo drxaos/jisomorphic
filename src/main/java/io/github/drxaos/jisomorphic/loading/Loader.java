@@ -3,11 +3,11 @@ package io.github.drxaos.jisomorphic.loading;
 import java.io.IOException;
 
 public interface Loader {
-    public static interface ResourceCallback {
-        void recv(String data, Template template);
+    public static interface Callback {
+        void receive(String data, Template template);
     }
 
-    void load(String path, Template template, ResourceCallback callback) throws IOException;
+    void requestResource(String path, Template template, Callback callback) throws IOException;
 
-    void api(String path, Template template, ResourceCallback callback) throws IOException;
+    void requestApi(String path, Template template, Callback callback) throws IOException;
 }

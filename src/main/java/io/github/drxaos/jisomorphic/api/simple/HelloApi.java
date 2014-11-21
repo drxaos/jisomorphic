@@ -25,9 +25,9 @@ public class HelloApi extends Api {
 
     public String id() throws IOException {
         Template template = new Template();
-        context.loader.api(UidApi.makeUrlNext(), template, new Loader.ResourceCallback() {
+        context.loader.requestApi(UidApi.makeUrlNext(), template, new Loader.Callback() {
             @Override
-            public void recv(String data, Template template) {
+            public void receive(String data, Template template) {
                 template.put("data", data);
             }
         });

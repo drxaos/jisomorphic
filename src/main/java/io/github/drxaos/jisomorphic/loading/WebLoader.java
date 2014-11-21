@@ -25,7 +25,7 @@ public class WebLoader implements Loader {
 
     private static Window window = (Window) JS.getGlobal();
 
-    private void request(String path, final Template template, final ResourceCallback callback, boolean post) throws IOException {
+    private void request(String path, final Template template, final Callback callback, boolean post) throws IOException {
         final XMLHttpRequest xhr = window.createXMLHttpRequest();
         xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
             @Override
@@ -33,7 +33,7 @@ public class WebLoader implements Loader {
                 if (xhr.getReadyState() == XMLHttpRequest.DONE) {
                     String data = xhr.getResponseText();
                     // TODO cache data if not post
-                    callback.recv(data, template);
+                    callback.receive(data, template);
                     template.removeCallback(callback);
                     if (template.isReady()) {
                         template.postProcess();
@@ -51,13 +51,13 @@ public class WebLoader implements Loader {
     }
 
     @Override
-    public void load(String path, final Template template, final ResourceCallback callback) throws IOException {
+    public void requestResource(String path, final Template template, final Callback callback) throws IOException {
         request(path, template, callback, false);
 
     }
 
     @Override
-    public void api(String path, final Template template, final ResourceCallback callback) throws IOException {
+    public void requestApi(String path, final Template template, final Callback callback) throws IOException {
         request(path, template, callback, true);
     }
 }

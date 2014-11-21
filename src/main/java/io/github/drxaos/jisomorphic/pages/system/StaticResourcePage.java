@@ -15,9 +15,9 @@ public class StaticResourcePage extends Page {
     @Override
     public Template render(final String params) throws IOException {
         Template template = new Template();
-        context.loader.load("/" + params, template, new Loader.ResourceCallback() {
+        context.loader.requestResource("/" + params, template, new Loader.Callback() {
             @Override
-            public void recv(String data, Template template) {
+            public void receive(String data, Template template) {
                 template.setPage(data, "/" + params);
             }
         });

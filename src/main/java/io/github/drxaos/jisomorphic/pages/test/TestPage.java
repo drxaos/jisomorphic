@@ -33,21 +33,21 @@ public class TestPage extends Page {
     @Override
     public Template render(final String params) throws IOException {
         Template template = new Template();
-        context.loader.load("/templates/index.html", template, new Loader.ResourceCallback() {
+        context.loader.requestResource("/templates/index.html", template, new Loader.Callback() {
             @Override
-            public void recv(String data, Template template) {
+            public void receive(String data, Template template) {
                 template.put("index.html", data);
             }
         });
-        context.loader.load("/templates/test.html", template, new Loader.ResourceCallback() {
+        context.loader.requestResource("/templates/test.html", template, new Loader.Callback() {
             @Override
-            public void recv(String data, Template template) {
+            public void receive(String data, Template template) {
                 template.put("test.html", data);
             }
         });
-        context.loader.api(TimeApi.makeUrlNow(), template, new Loader.ResourceCallback() {
+        context.loader.requestApi(TimeApi.makeUrlNow(), template, new Loader.Callback() {
             @Override
-            public void recv(String data, Template template) {
+            public void receive(String data, Template template) {
                 template.put("time", data + " (" + params + ")");
             }
         });
@@ -59,10 +59,10 @@ public class TestPage extends Page {
                                 "%TITLE%", title
                         ).replace(
                                 "%BODY%", template.getString("test.html")
-                                                .replace(
-                                                        "%TIME%", template.getString("time")
-                                                )
-                                ),
+                                        .replace(
+                                                "%TIME%", template.getString("time")
+                                        )
+                        ),
                         title
                 );
             }
@@ -83,9 +83,9 @@ public class TestPage extends Page {
                 document.getElementById("loading").setAttribute("style", "");
                 Template template = new Template();
                 try {
-                    context.loader.api(TimeApi.makeUrlNow(), template, new Loader.ResourceCallback() {
+                    context.loader.requestApi(TimeApi.makeUrlNow(), template, new Loader.Callback() {
                         @Override
-                        public void recv(String data, Template template) {
+                        public void receive(String data, Template template) {
                             Dispatcher.load(makeUrl("some", "page", data));
                         }
                     });
@@ -116,9 +116,9 @@ public class TestPage extends Page {
 
         helloButton.setDisabled(true);
         Template template = new Template();
-        context.loader.api(HelloApi.makeUrl(), template, new Loader.ResourceCallback() {
+        context.loader.requestApi(HelloApi.makeUrl(), template, new Loader.Callback() {
             @Override
-            public void recv(String data, Template template) {
+            public void receive(String data, Template template) {
                 template.put("data", data);
             }
         });

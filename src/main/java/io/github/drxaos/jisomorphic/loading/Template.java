@@ -22,13 +22,13 @@ public class Template {
         }
     }
 
-    ArrayList<Loader.ResourceCallback> callbacks = new ArrayList<Loader.ResourceCallback>();
+    ArrayList<Loader.Callback> callbacks = new ArrayList<Loader.Callback>();
 
     public boolean removeCallback(Object o) {
         return callbacks.remove(o);
     }
 
-    public boolean addCallback(Loader.ResourceCallback callback) {
+    public boolean addCallback(Loader.Callback callback) {
         return callbacks.add(callback);
     }
 

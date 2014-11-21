@@ -18,16 +18,16 @@ public class ServletLoader implements Loader {
     }
 
     @Override
-    public void load(String path, Template template, ResourceCallback callback) throws IOException {
+    public void requestResource(String path, Template template, Callback callback) throws IOException {
         InputStream input = servletContext.getResourceAsStream(path);
-        callback.recv(input == null ? "" : IOUtils.toString(input), template);
+        callback.receive(input == null ? "" : IOUtils.toString(input), template);
     }
 
     @Override
-    public void api(String path, final Template template, final ResourceCallback callback) throws IOException {
+    public void requestApi(String path, final Template template, final Callback callback) throws IOException {
         Api api = Api.findApi(path);
         api.init(new ApiContext(new ServletLoader(servletContext), new Database()));
         String result = api.render((path.length() > api.getUrl().length()) ? path.substring(api.getUrl().length() + 1) : "");
-        callback.recv(result == null ? "" : result, template);
+        callback.receive(result == null ? "" : result, template);
     }
 }

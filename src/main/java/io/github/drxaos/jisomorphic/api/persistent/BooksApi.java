@@ -16,7 +16,7 @@ public class BooksApi extends Api {
         url = URL;
     }
 
-    public static String makeUrlList() {
+    public static String makeUrlList(int page) {
         return URL + "/list";
     }
 

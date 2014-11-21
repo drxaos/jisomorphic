@@ -44,9 +44,10 @@ public class Book {
     public static List<Book> findBooks(Database database) {
         ArrayList<Book> books = new ArrayList<Book>();
 
-        books.add(new Book(1, "Napoleon: A Life", 976));
-        books.add(new Book(2, "Big Driver", 198));
-        books.add(new Book(3, "Girl on a Wire", 386));
+//        books.add(new Book(1, "Napoleon: A Life", 976));
+//        books.add(new Book(2, "Big Driver", 198));
+//        books.add(new Book(3, "Girl on a Wire", 386));
+        books.add(new Book(3, "A", 4));
 
         return books;
     }

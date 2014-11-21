@@ -8,7 +8,10 @@ import net.java.html.js.JavaScriptBody;
 import org.teavm.dom.browser.Window;
 import org.teavm.dom.core.Element;
 import org.teavm.dom.core.NodeList;
+import org.teavm.dom.events.Event;
+import org.teavm.dom.events.EventListener;
 import org.teavm.dom.html.HTMLDocument;
+import org.teavm.dom.html.HTMLLinkElement;
 import org.teavm.jso.JS;
 
 public class Dispatcher {
@@ -30,8 +33,20 @@ public class Dispatcher {
         addRelocationTrigger();
 
         NodeList<Element> a = document.getElementsByTagName("a");
-        // TODO a.onClick -> load(href);
-
+        for (int i = 0; i < a.getLength(); i++) {
+            final HTMLLinkElement link = (HTMLLinkElement) a.item(i);
+            final String href = link.getAttribute("href");
+            if (href == null || href.isEmpty()) {
+                continue;
+            }
+            link.addEventListener("click", new EventListener() {
+                @Override
+                public void handleEvent(Event evt) {
+                    evt.preventDefault();
+                    Dispatcher.load(href);
+                }
+            });
+        }
 
         try {
             Page page = Page.findPage(location);
@@ -61,6 +76,9 @@ public class Dispatcher {
                 }
             });
             Page page = Page.findPage(url);
+            if (page == null) {
+                System.out.println("Page not found: " + url);
+            }
             page.init(new PageContext(webLoader, pid));
             page.render((url.length() > page.getUrl().length()) ? url.substring(page.getUrl().length() + 1) : "");
         } catch (Exception e) {

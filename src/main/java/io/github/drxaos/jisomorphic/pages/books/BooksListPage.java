@@ -1,5 +1,6 @@
 package io.github.drxaos.jisomorphic.pages.books;
 
+import io.github.drxaos.jisomorphic.UrlUtils;
 import io.github.drxaos.jisomorphic.api.persistent.BooksApi;
 import io.github.drxaos.jisomorphic.loading.Loader;
 import io.github.drxaos.jisomorphic.loading.Template;
@@ -7,8 +8,11 @@ import io.github.drxaos.jisomorphic.pages.Page;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class BooksListPage extends Page {
 
@@ -24,18 +28,25 @@ public class BooksListPage extends Page {
 
     @Override
     public Template render(String params) throws IOException {
+        Map<String, String> paramsMap = UrlUtils.parseParams(params, "page");
+        final Integer page = UrlUtils.getInt("page", paramsMap, 1);
+
         final String title = "Books List";
         Template template = new Template();
-        context.loader.load("/templates/index.html", template, new Loader.ResourceCallback() {
+        context.loader.requestResource("/templates/index.html", template, new Loader.Callback() {
             @Override
-            public void recv(String data, Template template) {
+            public void receive(String data, Template template) {
                 template.put("index.html", data);
             }
         });
-        context.loader.api(BooksApi.makeUrlList(), template, new Loader.ResourceCallback() {
+        context.loader.requestApi(BooksApi.makeUrlList(page), template, new Loader.Callback() {
             @Override
-            public void recv(String data, Template template) {
-                template.put("list", JSONValue.parse(data));
+            public void receive(String data, Template template) {
+                System.out.println(data);
+
+                Object list = JSONValue.parse(data);
+                System.out.println(list);
+                template.put("list", list);
             }
         });
         template.setPostProcessor(new Template.PostProcessor() {
@@ -53,9 +64,13 @@ public class BooksListPage extends Page {
                             .append(book.get("pageCount"))
                             .append(")<br/>");
                 }
-                b.append("<a href=\"" + BooksListPage.makeUrl(0) + "\">First</a>");
-                for (int i = 1; i < 5; i++) {
-                    b.append("/ <a href=\"" + BooksListPage.makeUrl(i) + "\">" + i + "</a>");
+                b.append("<a href=\"" + BooksListPage.makeUrl(1) + "\">First</a>");
+                for (int i = Math.max(1, page - 3); i < page + 3; i++) {
+                    if (page == i) {
+                        b.append(" / " + i);
+                    } else {
+                        b.append(" / <a href=\"" + BooksListPage.makeUrl(i) + "\">" + i + "</a>");
+                    }
                 }
                 template.setPage(template.getString("index.html").replace(
                         "%BODY%", b.toString()
