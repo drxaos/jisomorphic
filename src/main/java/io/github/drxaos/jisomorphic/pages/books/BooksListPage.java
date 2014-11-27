@@ -8,11 +8,8 @@ import io.github.drxaos.jisomorphic.pages.Page;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class BooksListPage extends Page {
 
@@ -28,8 +25,8 @@ public class BooksListPage extends Page {
 
     @Override
     public Template render(String params) throws IOException {
-        Map<String, String> paramsMap = UrlUtils.parseParams(params, "page");
-        final Integer page = UrlUtils.getInt("page", paramsMap, 1);
+        UrlUtils.Params p = UrlUtils.parseParams(params);
+        final Integer page = p.getInt(0, 1);
 
         final String title = "Books List";
         Template template = new Template();
@@ -42,10 +39,7 @@ public class BooksListPage extends Page {
         context.loader.requestApi(BooksApi.makeUrlList(page), template, new Loader.Callback() {
             @Override
             public void receive(String data, Template template) {
-                System.out.println(data);
-
                 Object list = JSONValue.parse(data);
-                System.out.println(list);
                 template.put("list", list);
             }
         });

@@ -1,42 +1,51 @@
 package io.github.drxaos.jisomorphic;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class UrlUtils {
 
-    public static Map<String, String> parseParams(String params, String... paramsNames) {
-        HashMap<String, String> result = new HashMap<String, String>();
-        String[] split = params.split("\\/");
-        for (int i = 0; i < paramsNames.length; i++) {
-            if (split.length > i) {
-                result.put(paramsNames[i], split[i]);
+    public static class Params {
+        String[] split;
+
+        public Params(String params) {
+            split = params.split("\\/");
+        }
+
+
+        public String getString(int paramIndex, String defaultValue) {
+            String v = null;
+            if (split.length > paramIndex) {
+                v = split[paramIndex];
+            }
+            return v == null ? defaultValue : v;
+        }
+
+        public Integer getInt(int paramIndex, Integer defaultValue) {
+            String v = null;
+            if (split.length > paramIndex) {
+                v = split[paramIndex];
+            }
+            try {
+                return v == null ? defaultValue : Integer.parseInt(v);
+            } catch (NumberFormatException e) {
+                return defaultValue;
             }
         }
-        return result;
-    }
 
-    public static String getString(String paramName, Map<String, String> params, String defaultValue) {
-        String v = params.get(paramName);
-        return v == null ? defaultValue : v;
-    }
-
-    public static Integer getInt(String paramName, Map<String, String> params, Integer defaultValue) {
-        String v = params.get(paramName);
-        try {
-            return v == null ? defaultValue : Integer.parseInt(v);
-        } catch (NumberFormatException e) {
-            return defaultValue;
+        public Float getFloat(int paramIndex, Float defaultValue) {
+            String v = null;
+            if (split.length > paramIndex) {
+                v = split[paramIndex];
+            }
+            try {
+                return v == null ? defaultValue : Float.parseFloat(v);
+            } catch (NumberFormatException e) {
+                return defaultValue;
+            }
         }
+
     }
 
-    public static Float getFloat(String paramName, Map<String, String> params, Float defaultValue) {
-        String v = params.get(paramName);
-        try {
-            return v == null ? defaultValue : Float.parseFloat(v);
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
+    public static Params parseParams(String params) {
+        return new Params(params);
     }
 
 }

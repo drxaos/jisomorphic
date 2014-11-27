@@ -41,13 +41,12 @@ public class Book {
         this.pageCount = pageCount;
     }
 
-    public static List<Book> findBooks(Database database) {
+    public static List<Book> findBooks(Database database, int page) {
         ArrayList<Book> books = new ArrayList<Book>();
 
-//        books.add(new Book(1, "Napoleon: A Life", 976));
-//        books.add(new Book(2, "Big Driver", 198));
-//        books.add(new Book(3, "Girl on a Wire", 386));
-        books.add(new Book(3, "A", 4));
+        books.add(new Book(page * 3 + 1, "Napoleon: A Life", 976));
+        books.add(new Book(page * 3 + 2, "Big Driver", 198));
+        books.add(new Book(page * 3 + 3, "Girl on a Wire", 386));
 
         return books;
     }

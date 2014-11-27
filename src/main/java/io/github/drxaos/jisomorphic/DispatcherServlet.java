@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.Charset;
 
 public class DispatcherServlet extends HttpServlet {
 
@@ -23,7 +24,7 @@ public class DispatcherServlet extends HttpServlet {
         page.init(new PageContext(new ServletLoader(getServletContext()), 0));
         Template rendered = page.render((url.length() > page.getUrl().length()) ? url.substring(page.getUrl().length() + 1) : "");
         rendered.postProcess();
-        response.getWriter().write(rendered.getPage());
+        response.getOutputStream().write(rendered.getPage().getBytes(Charset.defaultCharset()));
     }
 
     @Override
@@ -32,7 +33,7 @@ public class DispatcherServlet extends HttpServlet {
         Api api = Api.findApi(url);
         api.init(new ApiContext(new ServletLoader(getServletContext()), new Database()));
         String rendered = api.render((url.length() > api.getUrl().length()) ? url.substring(api.getUrl().length() + 1) : "");
-        response.getWriter().write(rendered);
+        response.getOutputStream().write(rendered.getBytes(Charset.defaultCharset()));
     }
 
 }
