@@ -72,23 +72,24 @@ public class Dispatcher {
                     if (pid != Dispatcher.getPid()) {
                         return;
                     }
-                    loaded(url, template.getTitle(), template.getPage());
+                    loaded(url, new String(template.getResult()));
                 }
             });
             Page page = Page.findPage(url);
             if (page == null) {
                 System.out.println("Page not found: " + url);
+                return;
             }
             page.init(new PageContext(webLoader, pid));
-            page.render((url.length() > page.getUrl().length()) ? url.substring(page.getUrl().length() + 1) : "");
+            page.render((url.length() > page.getUrl().length()) ? url.substring(page.getUrl().length() + 1) : "").addPostProcessor();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void loaded(String url, String title, String rendered) {
+    public static void loaded(String url, String rendered) {
         try {
-            push(url, title, rendered);
+            push(url, rendered);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -98,12 +99,12 @@ public class Dispatcher {
         load(url);
     }
 
-    @JavaScriptBody(args = {"url", "title", "content"}, body =
+    @JavaScriptBody(args = {"url", "content"}, body =
             ""
-                    + "window.history.pushState({\"url\":url, \"title\":title, \"html\":content}, title, url);"
                     + "document.open();document.write(content);document.close();"
+                    + "window.history.pushState({\"url\":url, \"title\":document.title, \"html\":content}, title, url);"
     )
-    private static native void push(String location, String title, String content);
+    private static native void push(String location, String content);
 
     /**
      * @return Current page path

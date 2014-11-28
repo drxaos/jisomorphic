@@ -13,16 +13,6 @@ public class WebLoader implements Loader {
         void ready(Template template);
     }
 
-    LoaderCallback loaderCallback;
-
-    public LoaderCallback getLoaderCallback() {
-        return loaderCallback;
-    }
-
-    public void setLoaderCallback(LoaderCallback loaderCallback) {
-        this.loaderCallback = loaderCallback;
-    }
-
     private static Window window = (Window) JS.getGlobal();
 
     private void request(String path, final Template template, final Callback callback, boolean post) throws IOException {
@@ -37,10 +27,6 @@ public class WebLoader implements Loader {
                     template.removeCallback(callback);
                     if (template.isReady()) {
                         template.postProcess();
-                        if (loaderCallback != null) {
-                            loaderCallback.ready(template);
-                            loaderCallback = null;
-                        }
                     }
                 }
             }

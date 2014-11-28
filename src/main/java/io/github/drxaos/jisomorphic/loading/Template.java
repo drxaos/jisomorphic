@@ -1,85 +1,109 @@
 package io.github.drxaos.jisomorphic.loading;
 
+import io.github.drxaos.jisomorphic.Context;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Template {
+
+    // Init
+
+    Context context;
+
+    public Template(Context context) {
+        this.context = context;
+    }
+
+    // Processing
+
+    public static final int TYPE_AFTER_ANY = 100;
+    public static final int TYPE_AFTER_ALL = 200;
+    public static final int TYPE_FINAL = 300;
+
     public static interface PostProcessor {
         void process(Template template);
     }
 
-    PostProcessor postProcessor;
+    Map<Integer, List<PostProcessor>> postProcessors = new HashMap<Integer, List<PostProcessor>>();
 
-    public void setPostProcessor(PostProcessor postProcessor) {
-        this.postProcessor = postProcessor;
+    {
+        postProcessors.put(TYPE_AFTER_ANY, new ArrayList<PostProcessor>());
+        postProcessors.put(TYPE_AFTER_ALL, new ArrayList<PostProcessor>());
+        postProcessors.put(TYPE_FINAL, new ArrayList<PostProcessor>());
     }
 
-    public void postProcess() {
-        if (postProcessor != null) {
+    public Template addPostProcessor(int type, PostProcessor postProcessor) {
+        this.postProcessors.get(type).add(postProcessor);
+        return this;
+    }
+
+    public Template addResource(String url, Loader.Callback<String> callback) throws IOException {
+        context.loader.requestResource(url, this, callback);
+        return this;
+    }
+
+    public Template addApi(String url, Loader.Callback<String> callback) throws IOException {
+        context.loader.requestApi(url, this, callback);
+        return this;
+    }
+
+    public void postProcess(int type) {
+        for (PostProcessor postProcessor : postProcessors.get(type)) {
             postProcessor.process(this);
-            postProcessor = null;
         }
     }
 
-    ArrayList<Loader.Callback> callbacks = new ArrayList<Loader.Callback>();
+    // Result
 
-    public boolean removeCallback(Object o) {
-        return callbacks.remove(o);
-    }
+    String type = "plain/html";
+    byte[] page = {};
 
-    public boolean addCallback(Loader.Callback callback) {
-        return callbacks.add(callback);
-    }
-
-    public boolean isReady() {
-        return callbacks.isEmpty();
-    }
-
-
-    String page = "";
-    String title = "";
-
-    public String getPage() {
+    public byte[] getResult() {
         return page;
     }
 
-    public String getTitle() {
-        return title;
+    public void setPage(String page) {
+        this.type = "plain/html";
+        this.page = page.getBytes(Charset.defaultCharset());
     }
 
-    public void setPage(String page, String title) {
-        this.page = page;
-        this.title = title;
+    public void setJson(String json) {
+        this.type = "application/json";
+        this.page = json.getBytes(Charset.defaultCharset());
     }
+
+    public void setBinary(byte[] data) {
+        this.type = "application/binary";
+        this.page = data;
+    }
+
+    public void setBinary(byte[] data, String contentType) {
+        this.type = contentType;
+        this.page = data;
+    }
+
+    // Storage
 
     HashMap<String, Object> map = new HashMap<String, Object>();
 
-    public int size() {
-        return map.size();
+    public Object getObject(String key, Object defaultValue) {
+        return map.containsKey(key) ? map.get(key) : defaultValue;
     }
 
-    public boolean isEmpty() {
-        return map.isEmpty();
-    }
-
-    public Object get(String key) {
-        return map.get(key);
-    }
-
-    public String getString(String key) {
+    public String getString(String key, String defaultValue) {
         Object val = map.get(key);
         if (val == null) {
-            return null;
+            return defaultValue;
         } else if (val instanceof String) {
             return (String) val;
         } else {
             return val.toString();
         }
-    }
-
-    public boolean containsKey(String key) {
-        return map.containsKey(key);
     }
 
     public Object put(String key, Object value) {
@@ -92,13 +116,5 @@ public class Template {
 
     public Object remove(String key) {
         return map.remove(key);
-    }
-
-    public void clear() {
-        map.clear();
-    }
-
-    public boolean containsValue(Object value) {
-        return map.containsValue(value);
     }
 }
