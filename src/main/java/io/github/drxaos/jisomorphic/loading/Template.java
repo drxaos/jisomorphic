@@ -19,6 +19,10 @@ public class Template {
         this.context = context;
     }
 
+    public Context getContext() {
+        return context;
+    }
+
     // Processing
 
     public static final int TYPE_AFTER_ANY = 100;

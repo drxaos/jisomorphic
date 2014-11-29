@@ -2,11 +2,11 @@ package io.github.drxaos.jisomorphic.pages.system;
 
 import io.github.drxaos.jisomorphic.loading.Loader;
 import io.github.drxaos.jisomorphic.loading.Template;
-import io.github.drxaos.jisomorphic.pages.Page;
+import io.github.drxaos.jisomorphic.Resource;
 
 import java.io.IOException;
 
-public class StaticResourcePage extends Page {
+public class StaticResourcePage extends Resource {
 
     public StaticResourcePage() {
         url = ""; // any url

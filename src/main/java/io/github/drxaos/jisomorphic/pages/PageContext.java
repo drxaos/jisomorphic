@@ -8,11 +8,14 @@ public class PageContext extends Context {
     /**
      * UID for callbacks validation
      */
-    public long pid;
+    long pid;
 
     public PageContext(Loader loader, long pid) {
         this.loader = loader;
         this.pid = pid;
     }
 
+    public long getPid() {
+        return pid;
+    }
 }

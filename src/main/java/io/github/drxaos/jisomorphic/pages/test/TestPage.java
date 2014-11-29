@@ -5,7 +5,7 @@ import io.github.drxaos.jisomorphic.api.simple.HelloApi;
 import io.github.drxaos.jisomorphic.api.simple.TimeApi;
 import io.github.drxaos.jisomorphic.loading.Loader;
 import io.github.drxaos.jisomorphic.loading.Template;
-import io.github.drxaos.jisomorphic.pages.Page;
+import io.github.drxaos.jisomorphic.Resource;
 import org.teavm.dom.browser.TimerHandler;
 import org.teavm.dom.browser.Window;
 import org.teavm.dom.events.Event;
@@ -17,7 +17,7 @@ import org.teavm.jso.JS;
 
 import java.io.IOException;
 
-public class TestPage extends Page {
+public class TestPage extends Resource {
 
     private static String URL = "/test";
 

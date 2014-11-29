@@ -4,14 +4,14 @@ import io.github.drxaos.jisomorphic.UrlUtils;
 import io.github.drxaos.jisomorphic.api.persistent.BooksApi;
 import io.github.drxaos.jisomorphic.loading.Loader;
 import io.github.drxaos.jisomorphic.loading.Template;
-import io.github.drxaos.jisomorphic.pages.Page;
+import io.github.drxaos.jisomorphic.Resource;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.io.IOException;
 
-public class BooksListPage extends Page {
+public class BooksListPage extends Resource {
 
     private static String URL = "/books/list";
 

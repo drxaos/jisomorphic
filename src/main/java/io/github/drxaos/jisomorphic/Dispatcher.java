@@ -2,7 +2,6 @@ package io.github.drxaos.jisomorphic;
 
 import io.github.drxaos.jisomorphic.loading.Template;
 import io.github.drxaos.jisomorphic.loading.WebLoader;
-import io.github.drxaos.jisomorphic.pages.Page;
 import io.github.drxaos.jisomorphic.pages.PageContext;
 import net.java.html.js.JavaScriptBody;
 import org.teavm.dom.browser.Window;
@@ -49,7 +48,7 @@ public class Dispatcher {
         }
 
         try {
-            Page page = Page.findPage(location);
+            Resource page = Resource.findPage(location);
             WebLoader webLoader = new WebLoader();
             page.init(new PageContext(webLoader, ++pid));
             page.animate(location);
@@ -75,7 +74,7 @@ public class Dispatcher {
                     loaded(url, new String(template.getResult()));
                 }
             });
-            Page page = Page.findPage(url);
+            Resource page = Resource.findPage(url);
             if (page == null) {
                 System.out.println("Page not found: " + url);
                 return;

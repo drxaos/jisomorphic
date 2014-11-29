@@ -11,4 +11,8 @@ public class ApiContext extends Context {
         this.loader = loader;
         this.database = database;
     }
+
+    public Database getDatabase() {
+        return database;
+    }
 }
