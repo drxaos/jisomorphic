@@ -7,6 +7,7 @@ import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class BooksApi extends Api {
@@ -32,8 +33,14 @@ public class BooksApi extends Api {
     }
 
     private String list(int page) {
+        ArrayList<Book> books = new ArrayList<Book>();
+
+        books.add(new Book(page * 3 + 1, "Napoleon: A Life", 976));
+        books.add(new Book(page * 3 + 2, "Big Driver", 198));
+        books.add(new Book(page * 3 + 3, "Girl on a Wire", 386));
+
         ArrayList<Map> result = new ArrayList<Map>();
-        for (Book book : Book.findBooks(context.database, page)) {
+        for (Book book : books) {
             result.add(book.asMap());
         }
         return JSONValue.toJSONString(result);

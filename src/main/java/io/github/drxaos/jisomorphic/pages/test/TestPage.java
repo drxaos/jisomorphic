@@ -1,6 +1,7 @@
 package io.github.drxaos.jisomorphic.pages.test;
 
 import io.github.drxaos.jisomorphic.Dispatcher;
+import io.github.drxaos.jisomorphic.Params;
 import io.github.drxaos.jisomorphic.api.simple.HelloApi;
 import io.github.drxaos.jisomorphic.api.simple.TimeApi;
 import io.github.drxaos.jisomorphic.loading.Loader;
@@ -19,55 +20,25 @@ import java.io.IOException;
 
 public class TestPage extends Resource {
 
-    private static String URL = "/test";
-
     public TestPage() {
-        url = URL;
-    }
-
-    public static String makeUrl(String param1, String param2, String param3) {
-        // example of url construction
-        return URL + "/" + param1 + "/" + param2 + "/" + param3;
+        super("/test/{param1}/{param2}/{param3}");
     }
 
     @Override
-    public Template render(final String params) throws IOException {
-        Template template = new Template();
-        context.loader.requestResource("/templates/index.html", template, new Loader.Callback() {
-            @Override
-            public void receive(String data, Template template) {
-                template.put("index.html", data);
-            }
-        });
-        context.loader.requestResource("/templates/test.html", template, new Loader.Callback() {
-            @Override
-            public void receive(String data, Template template) {
-                template.put("test.html", data);
-            }
-        });
-        context.loader.requestApi(TimeApi.makeUrlNow(), template, new Loader.Callback() {
-            @Override
-            public void receive(String data, Template template) {
-                template.put("time", data + " (" + params + ")");
-            }
-        });
-        template.setPostProcessor(new Template.PostProcessor() {
+    public void render(String method, final Params params, Template template) throws IOException {
+        template.resource("index.html", "/static/templates/index.html");
+        template.resource("test.html", "/static/templates/test.html");
+        template.resource("time", new Params(TimeApi.class).set(TimeApi.PARAM_WHEN, "now").getUrl());
+        template.postProcessor(new Template.PostProcessor() {
             @Override
             public void process(Template template) {
                 String title = (System.currentTimeMillis() % 2 == 0) ? "Some title" : "Hello World!";
-                template.setPage(template.getString("index.html").replace(
-                                "%TITLE%", title
-                        ).replace(
-                                "%BODY%", template.getString("test.html")
-                                        .replace(
-                                                "%TIME%", template.getString("time")
-                                        )
-                        ),
-                        title
-                );
+                String time = template.getString("time");
+                String test = template.getString("test.html").replace("%TIME%", time);
+                String page = template.getString("index.html").replace("%TITLE%", title).replace("%BODY", test);
+                template.setPage(page);
             }
         });
-        return template;
     }
 
     @Override
@@ -77,16 +48,25 @@ public class TestPage extends Resource {
         window.setTimeout(new TimerHandler() {
             @Override
             public void onTimer() {
-                if (context.pid != Dispatcher.getPid()) {
-                    return;
-                }
+//                if (context.pid != Dispatcher.getPid()) {
+//                    return;
+//                }
                 document.getElementById("loading").setAttribute("style", "");
                 Template template = new Template();
                 try {
+                    Dispatcher.render(new Params(TimeApi.class).set(TimeApi.PARAM_WHEN,"now").getUrl(),new Template.PostProcessor(){
+                        @Override
+                        public void process(Template template) {
+                            Dispatcher.load(new Params(TestPage.class).
+                                    set(TestPage.PARAM_PARAM1,"some").
+                                    set(TestPage.PARAM_PARAM2, "page").
+                                    set(TestPage.PARAM_PARAM3, template.getString("", "unknown")).
+                                    getUrl());
+                        }
+                    });
                     context.loader.requestApi(TimeApi.makeUrlNow(), template, new Loader.Callback() {
                         @Override
                         public void receive(String data, Template template) {
-                            Dispatcher.load(makeUrl("some", "page", data));
                         }
                     });
                 } catch (Exception e) {

@@ -10,7 +10,7 @@ public class Book {
     String name;
     int pageCount;
 
-    Book(long id, String name, int pageCount) {
+    public Book(long id, String name, int pageCount) {
         this.id = id;
         this.name = name;
         this.pageCount = pageCount;

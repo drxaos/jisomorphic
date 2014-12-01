@@ -25,39 +25,24 @@ public class Template {
 
     // Processing
 
-    public static final int TYPE_AFTER_ANY = 100;
-    public static final int TYPE_AFTER_ALL = 200;
-    public static final int TYPE_FINAL = 300;
-
     public static interface PostProcessor {
         void process(Template template);
     }
 
-    Map<Integer, List<PostProcessor>> postProcessors = new HashMap<Integer, List<PostProcessor>>();
+    List<PostProcessor> postProcessors=new ArrayList<PostProcessor>();
 
-    {
-        postProcessors.put(TYPE_AFTER_ANY, new ArrayList<PostProcessor>());
-        postProcessors.put(TYPE_AFTER_ALL, new ArrayList<PostProcessor>());
-        postProcessors.put(TYPE_FINAL, new ArrayList<PostProcessor>());
-    }
-
-    public Template addPostProcessor(int type, PostProcessor postProcessor) {
-        this.postProcessors.get(type).add(postProcessor);
+    public Template postProcessor(PostProcessor postProcessor) {
+        this.postProcessors.add(postProcessor);
         return this;
     }
 
-    public Template addResource(String url, Loader.Callback<String> callback) throws IOException {
+    public Template resource(String url, Loader.Callback<String> callback) throws IOException {
         context.loader.requestResource(url, this, callback);
         return this;
     }
 
-    public Template addApi(String url, Loader.Callback<String> callback) throws IOException {
-        context.loader.requestApi(url, this, callback);
-        return this;
-    }
-
-    public void postProcess(int type) {
-        for (PostProcessor postProcessor : postProcessors.get(type)) {
+    public void postProcess() {
+        for (PostProcessor postProcessor : postProcessors) {
             postProcessor.process(this);
         }
     }

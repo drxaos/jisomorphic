@@ -3,8 +3,8 @@ package io.github.drxaos.jisomorphic.loading;
 import java.io.IOException;
 
 public interface Loader {
-    public static interface Callback<T> {
-        void receive(T data, Template template);
+    public static interface Callback {
+        void receive(byte[] data, Template template);
     }
 
     void requestResource(String path, Template template, Callback<String> callback) throws IOException;

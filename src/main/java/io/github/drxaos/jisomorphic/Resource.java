@@ -19,7 +19,7 @@ abstract public class Resource {
         this.url = urlTemplate;
     }
 
-    abstract public void render(Params params, Template template) throws IOException;
+    abstract public void render(String method, Params params, Template template) throws IOException;
 
     public void animate(Params params) throws IOException {
         // default
